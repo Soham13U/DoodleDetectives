@@ -1,0 +1,35 @@
+# Node / TypeScript
+node_modules/
+dist/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-error.log*
+
+# OS/Editors
+.DS_Store
+.vscode/
+.idea/
+*.swp
+
+# Env
+.env
+.env.*
+!.env.example
+
+# Project-specific
+client/
+answer.txt
+design_document.txt
+
+# Frontend (Vite) build
+frontend/dist/
+
+# Server build
+server/dist/
+
+# Cursor/Temp
+.cursordb/
+.cursor/
+**/.cursor/**
+**/terminals/**
