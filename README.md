@@ -1,18 +1,24 @@
-# Drawing Game Practice
+# <DoodleDetectives>
 
-Practice project to recreate the mini drawing game from scratch.
+- Server: Node/Express + Socket.IO (TypeScript)
+- Frontend: Vite + React + TypeScript
 
-## Setup
+## Dev
+Server:
+  cd server
+  npm i
+  npm run dev
 
-1. Install server dependencies:
-```bash
-cd server
-npm install
-```
+Frontend:
+  cd frontend
+  npm i
+  npm run dev
+  # expects VITE_SERVER_URL (default http://localhost:3020)
 
-2. Run the server:
-```bash
-npm run dev
-```
+## Build
+Server: npm run build && node dist/index.js
+Frontend: npm run build (outputs to frontend/dist)
 
-3. Open `client/index.html` in a browser
+## Env
+Frontend: VITE_SERVER_URL
+Server: PORT (defaults to 3020), ALLOWED_ORIGIN (for CORS)
