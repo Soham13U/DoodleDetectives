@@ -906,7 +906,7 @@ const io = new Server(httpServer,{
 });
 
 app.get('/',(req:express.Request,res:express.Response)=>{
-    res.send("Drawing prac");   
+    res.send("DoodleDetectives");   
 });
 
 io.on("connection",(socket)=>{
@@ -972,6 +972,9 @@ io.on("connection",(socket)=>{
             roomId,
             roomName: room.roomName,
             phase: room.phase,
+            currentRound: room.currentRound,
+            maxRounds: room.maxRounds,
+            totalScores: room.totalScores,
             players: Array.from(room.players.values()).map((p) => ({
                 playerId: p.playerId,
                 name: p.name,

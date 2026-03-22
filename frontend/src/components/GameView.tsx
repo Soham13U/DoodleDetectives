@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { CanvasGrid } from "./CanvasGrid";
 import type { Player, StrokePoint } from "../types/socket";
+import { Badge, Button, Card, Input, LabelField, Message, SectionTitle, Surface } from "./ui";
 
 type Props = {
   phase: string;
@@ -35,43 +36,61 @@ export function GameView(props: Props) {
   const [guessText, setGuessText] = useState("");
   const [brushColor, setBrushColor] = useState("#000000");
   const [brushThickness, setBrushThickness] = useState(3);
+  const [finishClicked, setFinishClicked] = useState(false);
 
   useEffect(() => {
     setGuessText("");
     setBrushColor("#000000");
     setBrushThickness(3);
+    setFinishClicked(false);
   }, [props.currentRound]);
 
   const canDraw = props.phase === "DRAWING";
   const canGuess = props.phase === "VIEW_GUESS";
 
   return (
-    <section className="panel">
-      <h2>Game</h2>
-      <p>
-        Round {props.currentRound}/{props.maxRounds} | Phase: {props.phase}
-        {props.timeLeftMs !== null ? ` | Time: ${Math.max(0, Math.floor(props.timeLeftMs / 1000))}s` : ""}
-      </p>
+    <Surface className={`panel ${canDraw || canGuess ? "low-motion-zone" : ""}`}>
+      <SectionTitle
+        title="Game"
+        subtitle={`Round ${props.currentRound}/${props.maxRounds} ${
+          props.timeLeftMs !== null ? `• ${Math.max(0, Math.floor(props.timeLeftMs / 1000))}s` : ""
+        }`}
+        right={<Badge tone="brand">{props.phase}</Badge>}
+      />
       {props.phase === "DRAWING" && (
-        <p>
-          Your word: <b>{props.myAssignedWord || "(waiting)"}</b>
-        </p>
+        <Card title="Your Drawing Clue">
+          <p>
+            Your word: <b>{props.myAssignedWord || "(waiting)"}</b>
+          </p>
+        </Card>
       )}
-      {props.phase === "VIEW_GUESS" && <p>Prompt: {props.prompt.join(" ")}</p>}
+      {props.phase === "VIEW_GUESS" && <Card title="Prompt">{props.prompt.join(" ")}</Card>}
 
       {props.phase === "DRAWING" && (
-        <div className="actions">
-          <label>
-            Color
-            <input type="color" value={brushColor} onChange={(e) => setBrushColor(e.target.value)} />
-          </label>
-          <label>
-            Thickness
-            <input type="range" min={1} max={20} value={brushThickness} onChange={(e) => setBrushThickness(Number(e.target.value))} />
-          </label>
-          <button onClick={() => void props.onClearCanvas()}>Clear</button>
-          <button onClick={() => void props.onFinishDrawing()}>Finish Drawing</button>
-        </div>
+        <Card title="Drawing Controls">
+          <div className="actions">
+            <LabelField label="Color" className="compact-field">
+              <Input type="color" value={brushColor} onChange={setBrushColor} />
+            </LabelField>
+            <LabelField label={`Thickness: ${brushThickness}`} className="compact-field">
+              <Input type="range" min={1} max={20} value={brushThickness} onChange={(v) => setBrushThickness(Number(v))} />
+            </LabelField>
+            <Button variant="secondary" onClick={() => void props.onClearCanvas()}>
+              Clear
+            </Button>
+            <Button
+              variant="primary"
+              onClick={async () => {
+                if (finishClicked) return;
+                setFinishClicked(true);
+                await props.onFinishDrawing();
+              }}
+              disabled={finishClicked}
+            >
+              {finishClicked ? "Finished" : "Finish Drawing"}
+            </Button>
+          </div>
+        </Card>
       )}
 
       <CanvasGrid
@@ -88,11 +107,10 @@ export function GameView(props: Props) {
       />
 
       {canGuess && (
-        <div className="card">
-          <h3>Guess</h3>
-          <input
+        <Card title="Guess">
+          <Input
             value={guessText}
-            onChange={(e) => setGuessText(e.target.value)}
+            onChange={setGuessText}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 e.preventDefault();
@@ -103,7 +121,9 @@ export function GameView(props: Props) {
             }}
             placeholder="Type full prompt..."
           />
-          <button
+          <Button
+            className="mt-2"
+            variant="primary"
             onClick={() => {
               if (!guessText.trim()) return;
               void props.onSubmitGuess(guessText.trim());
@@ -111,12 +131,11 @@ export function GameView(props: Props) {
             }}
           >
             Submit
-          </button>
-        </div>
+          </Button>
+        </Card>
       )}
 
-      <div className="card">
-        <h3>Chat</h3>
+      <Card title="Chat">
         <div className="chat">
           {props.chat.map((c, idx) => (
             <div key={idx}>
@@ -125,11 +144,10 @@ export function GameView(props: Props) {
             </div>
           ))}
         </div>
-      </div>
+      </Card>
 
       {props.phase === "REVEAL" && props.reveal && (
-        <div className="card">
-          <h3>Reveal</h3>
+        <Card title="Reveal">
           <p>
             Correct:{" "}
             {(() => {
@@ -144,12 +162,11 @@ export function GameView(props: Props) {
               </li>
             ))}
           </ul>
-        </div>
+        </Card>
       )}
 
       {props.phase === "GAME_OVER" && (
-        <div className="card">
-          <h3>Game Over</h3>
+        <Card title="Game Over" subtitle="Final scores">
           <ul>
             {props.players
               .slice()
@@ -160,10 +177,14 @@ export function GameView(props: Props) {
                 </li>
               ))}
           </ul>
-          {props.me?.isHost && <button onClick={() => void props.onReturnToLobby()}>Return to Lobby</button>}
-        </div>
+          {props.me?.isHost && (
+            <Button variant="primary" onClick={() => void props.onReturnToLobby()}>
+              Return to Lobby
+            </Button>
+          )}
+        </Card>
       )}
-      {props.message && <p className="inline-message">{props.message}</p>}
-    </section>
+      <Message text={props.message} />
+    </Surface>
   );
 }

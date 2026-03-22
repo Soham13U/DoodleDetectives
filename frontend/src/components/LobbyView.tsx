@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { Player } from "../types/socket";
+import { Badge, Button, Card, Input, LabelField, Message, SectionTitle, Surface, Select } from "./ui";
 
 type Props = {
   connected: boolean;
@@ -30,87 +31,109 @@ export function LobbyView(props: Props) {
 
   if (!props.inRoom) {
     return (
-      <section className="panel">
-        <h2>Lobby</h2>
-        <div className="field">
-          <label>Server URL</label>
-          <input value={props.serverUrl} onChange={(e) => props.setServerUrl(e.target.value)} />
-          <small>Status: {props.connected ? "Connected" : "Disconnected"}</small>
-        </div>
+      <Surface className="panel" glow>
+        <SectionTitle
+          title="Lobby"
+          subtitle="Create a room, invite friends, and start the next detective round."
+          right={<Badge tone="brand">Pre-Game</Badge>}
+        />
+        <LabelField label="Server URL" hint={`Status: ${props.connected ? "Connected" : "Disconnected"}`}>
+          <Input value={props.serverUrl} onChange={props.setServerUrl} />
+        </LabelField>
         {props.hasSavedIdentity ? (
-          <div className="card">
-            <h3>Resume Your Game</h3>
+          <Card title="Resume Your Game" subtitle="Quickly return with your saved identity.">
             <p>
               Reconnect as <b>{props.savedIdentity?.name}</b> in room <code>{props.savedIdentity?.roomId}</code>?
             </p>
             <div className="actions">
-              <button onClick={() => void props.onReconnectSaved()}>Reconnect</button>
-              <button onClick={() => props.onChangePlayer()}>Change Player</button>
+              <Button variant="primary" onClick={() => void props.onReconnectSaved()}>
+                Reconnect
+              </Button>
+              <Button variant="ghost" onClick={() => props.onChangePlayer()}>
+                Change Player
+              </Button>
             </div>
-          </div>
+          </Card>
         ) : (
-          <div className="field">
-            <label>Your Name</label>
-            <input value={name} onChange={(e) => setName(e.target.value)} />
-          </div>
+          <LabelField label="Your Name">
+            <Input value={name} onChange={setName} placeholder="Detective name" />
+          </LabelField>
         )}
         <div className="grid-2">
-          <div className="card">
-            <h3>Create Room</h3>
-            <div className="field">
-              <label>Room Name</label>
-              <input value={roomName} onChange={(e) => setRoomName(e.target.value)} />
-            </div>
-            <div className="field">
-              <label>Rounds: {rounds}</label>
-              <input type="range" min={1} max={5} value={rounds} onChange={(e) => setRounds(Number(e.target.value))} />
-            </div>
-            <div className="field">
-              <label>Players: {maxPlayers}</label>
-              <input type="range" min={2} max={6} value={maxPlayers} onChange={(e) => setMaxPlayers(Number(e.target.value))} />
-            </div>
-            <button onClick={() => void props.onCreateRoom(name, roomName, rounds, maxPlayers)} disabled={props.hasSavedIdentity}>
-              Create
-            </button>
-          </div>
-          <div className="card">
-            <h3>Join Room</h3>
-            <div className="field">
-              <label>Room ID</label>
-              <input value={roomId} onChange={(e) => setRoomId(e.target.value)} />
-            </div>
-            <button onClick={() => void props.onJoinRoom(name, roomId, false)} disabled={props.hasSavedIdentity}>
-              Join
-            </button>
-          </div>
+          <Card title="Create Room" subtitle="Host a new match and control game settings.">
+            <LabelField label="Room Name">
+              <Input value={roomName} onChange={setRoomName} placeholder="e.g. ninja-room" />
+            </LabelField>
+            <LabelField label="Rounds">
+              <Select
+                value={rounds}
+                onChange={(v) => setRounds(Number(v))}
+                options={[1, 2, 3, 4, 5].map((n) => ({ value: n, label: String(n) }))}
+              />
+            </LabelField>
+            <LabelField label="Players">
+              <Select
+                value={maxPlayers}
+                onChange={(v) => setMaxPlayers(Number(v))}
+                options={[2, 3, 4, 5, 6].map((n) => ({ value: n, label: String(n) }))}
+              />
+            </LabelField>
+            <Button
+              variant="primary"
+              onClick={() => void props.onCreateRoom(name, roomName, rounds, maxPlayers)}
+              disabled={props.hasSavedIdentity}
+            >
+              Create Room
+            </Button>
+          </Card>
+          <Card title="Join Room" subtitle="Enter room ID and jump into the lobby.">
+            <LabelField label="Room ID">
+              <Input value={roomId} onChange={setRoomId} placeholder="room_xxxxxxxx" />
+            </LabelField>
+            <Button variant="secondary" onClick={() => void props.onJoinRoom(name, roomId, false)} disabled={props.hasSavedIdentity}>
+              Join Room
+            </Button>
+          </Card>
         </div>
-        {props.message && <p className="inline-message">{props.message}</p>}
-      </section>
+        <Message text={props.message} />
+      </Surface>
     );
   }
 
   return (
-    <section className="panel">
-      <h2>In-Room Lobby</h2>
+    <Surface className="panel">
+      <SectionTitle title="In-Room Lobby" subtitle="Waiting for host to start the round." right={<Badge tone="brand">{props.phase}</Badge>} />
       <p>
         You: <b>{props.me?.name}</b> | Role: <b>{props.me?.isHost ? "Host" : "Player"}</b> | Phase: <b>{props.phase}</b>
       </p>
-      <p>Room: {props.me?.roomName ?? props.me?.roomId}</p>
-      <ul>
-        {props.players.map((p) => (
-          <li key={p.playerId}>
-            {p.name} {p.isHost ? "[Host]" : ""}
-          </li>
-        ))}
-      </ul>
+      <p>
+        Room: <code>{props.me?.roomName ?? props.me?.roomId}</code>
+      </p>
+      <Card title="Players in Room">
+        <ul className="player-list">
+          {props.players.map((p) => (
+            <li key={p.playerId}>
+              {p.name} {p.isHost ? <Badge tone="good">Host</Badge> : null}
+            </li>
+          ))}
+        </ul>
+      </Card>
       {props.phase === "LOBBY" && (
         <div className="actions">
-          {props.me?.isHost && <button onClick={() => void props.onStartGame()}>Start Game</button>}
-          <button onClick={() => void props.onCopyRoomId()}>Copy Room ID</button>
-          <button onClick={() => void props.onLeaveRoom()}>Leave Room</button>
+          {props.me?.isHost && (
+            <Button variant="primary" onClick={() => void props.onStartGame()}>
+              Start Game
+            </Button>
+          )}
+          <Button variant="secondary" onClick={() => void props.onCopyRoomId()}>
+            Copy Room ID
+          </Button>
+          <Button variant="danger" onClick={() => void props.onLeaveRoom()}>
+            Leave Room
+          </Button>
         </div>
       )}
-      {props.message && <p className="inline-message">{props.message}</p>}
-    </section>
+      <Message text={props.message} />
+    </Surface>
   );
 }

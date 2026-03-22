@@ -1,10 +1,13 @@
+@import "tailwindcss";
+
 * {
   box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
+    Helvetica, Arial, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
   background: #f5f6fa;
   color: #222;
 }
@@ -17,6 +20,211 @@ body {
 
 .app h1 {
   margin: 0 0 12px;
+}
+
+.app-hero {
+  margin-bottom: 12px;
+}
+
+.ui-surface {
+  position: relative;
+  border: 1px solid #dedff5;
+  border-radius: 14px;
+  background: linear-gradient(145deg, #ffffff, #f9faff 50%, #f5f6ff);
+  padding: 12px;
+}
+
+.ui-surface-glow::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: 14px;
+  pointer-events: none;
+  box-shadow: 0 0 0 1px rgba(108, 125, 255, 0.2), 0 8px 30px rgba(108, 125, 255, 0.12);
+}
+
+.ui-card {
+  background: #ffffff;
+  border: 1px solid #e5e7ee;
+  border-radius: 12px;
+  padding: 12px;
+  margin-top: 10px;
+}
+
+.ui-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.ui-card-title {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.ui-card-subtitle {
+  margin: 2px 0 0;
+  color: #636985;
+  font-size: 0.9rem;
+}
+
+.ui-section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.ui-section-title h2 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.ui-section-title p {
+  margin: 4px 0 0;
+  color: #58607a;
+}
+
+.ui-field {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.compact-field {
+  margin-bottom: 0;
+}
+
+.ui-label {
+  font-size: 0.9rem;
+  color: #353c52;
+  font-weight: 600;
+}
+
+.ui-hint {
+  color: #6b728a;
+}
+
+.ui-input {
+  width: 100%;
+  min-height: 38px;
+  padding: 8px 10px;
+  border: 1px solid #cfd4e6;
+  border-radius: 10px;
+  background: #fff;
+  font-size: 0.95rem;
+}
+
+.ui-input:focus {
+  outline: 2px solid #b7c1ff;
+  outline-offset: 1px;
+}
+
+.ui-btn {
+  border: 1px solid transparent;
+  border-radius: 10px;
+  min-height: 38px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: transform 0.15s ease, opacity 0.2s ease, background-color 0.2s ease;
+}
+
+.ui-btn:hover {
+  transform: translateY(-1px);
+}
+
+.ui-btn:active {
+  transform: translateY(0);
+}
+
+.ui-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.ui-btn-primary {
+  background: #6c7dff;
+  color: #fff;
+}
+
+.ui-btn-secondary {
+  background: #eef1ff;
+  color: #27316b;
+  border-color: #d4dbff;
+}
+
+.ui-btn-ghost {
+  background: #fff;
+  color: #39415d;
+  border-color: #d5dae8;
+}
+
+.ui-btn-danger {
+  background: #ffe8ea;
+  color: #8f1f2f;
+  border-color: #ffc9d0;
+}
+
+.ui-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  padding: 3px 8px;
+  font-weight: 700;
+}
+
+.ui-badge-neutral {
+  background: #eef1f7;
+  color: #354059;
+}
+
+.ui-badge-good {
+  background: #def8e7;
+  color: #18643a;
+}
+
+.ui-badge-warn {
+  background: #fff3d9;
+  color: #7b4f00;
+}
+
+.ui-badge-brand {
+  background: #e8ecff;
+  color: #3342a7;
+}
+
+.ui-message {
+  margin-top: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+}
+
+.ui-message-info {
+  background: #edf4ff;
+  border-color: #cbdefe;
+  color: #1f4679;
+}
+
+.ui-message-good {
+  background: #e9fdf1;
+  border-color: #b9f0cf;
+  color: #19643a;
+}
+
+.ui-message-warn {
+  background: #fff8e9;
+  border-color: #efd89d;
+  color: #6a4700;
+}
+
+.player-list {
+  margin: 0;
+  padding-left: 18px;
 }
 
 .panel {
@@ -75,6 +283,15 @@ button {
   width: 100%;
   border: 1px solid #ccc;
   background: #fff;
+  border-radius: 8px;
+}
+
+.canvas-title {
+  margin: 0 0 8px;
+}
+
+.low-motion-zone * {
+  animation: none !important;
 }
 
 .chat {
@@ -95,7 +312,17 @@ button {
 }
 
 @media (max-width: 900px) {
+  #app {
+    padding: 12px;
+  }
   .grid-2 {
+    grid-template-columns: 1fr;
+  }
+  .ui-section-title {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .canvas-grid {
     grid-template-columns: 1fr;
   }
 }

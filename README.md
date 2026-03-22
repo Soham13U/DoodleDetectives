@@ -1,4 +1,4 @@
-# <DoodleDetectives>
+# DoodleDetectives
 
 - Server: Node/Express + Socket.IO (TypeScript)
 - Frontend: Vite + React + TypeScript

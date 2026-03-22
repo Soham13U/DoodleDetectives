@@ -151,8 +151,8 @@ export function CanvasGrid(props: Props) {
   return (
     <div className="canvas-grid">
       {visiblePlayers.map((p) => (
-        <div key={p.playerId} className="canvas-card">
-          <h4>
+        <div key={p.playerId} className="canvas-card ui-card">
+          <h4 className="canvas-title">
             {p.name}
             {p.playerId === props.mePlayerId ? " (You)" : ""}
           </h4>

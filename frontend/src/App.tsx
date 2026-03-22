@@ -1,5 +1,6 @@
 import { LobbyView } from "./components/LobbyView";
 import { GameView } from "./components/GameView";
+import { Badge, SectionTitle, Surface } from "./components/ui";
 import { emitWithAck } from "./lib/socket";
 import { useGameState } from "./hooks/useGameState";
 import type { StrokePoint } from "./types/socket";
@@ -32,7 +33,13 @@ export function App() {
 
   return (
     <main className="app">
-      <h1>Draw and Guess (React)</h1>
+      <Surface className="app-hero" glow={game.phase === "LOBBY" || game.phase === "REVEAL" || game.phase === "GAME_OVER"}>
+        <SectionTitle
+          title="DoodleDetectives"
+          subtitle="Draw clues. Guess fast. Outsmart everyone."
+          right={<Badge tone={game.connected ? "good" : "warn"}>{game.connected ? "Online" : "Offline"}</Badge>}
+        />
+      </Surface>
       <LobbyView
         connected={game.connected}
         inRoom={game.inRoom}
