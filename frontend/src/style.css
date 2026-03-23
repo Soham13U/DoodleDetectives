@@ -326,3 +326,86 @@ button {
     grid-template-columns: 1fr;
   }
 }
+
+/* Scene effects (subtle, low-motion) */
+.scene {
+  position: relative;
+  isolation: isolate;
+}
+.fx-layer {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: 14px;
+}
+/* Tones */
+.fx-tone-lobby {
+  --fx1: #6c7dff;
+  --fx2: #a5b4ff;
+  --fx3: #e8ecff;
+}
+.fx-tone-reveal {
+  --fx1: #22c55e;
+  --fx2: #86efac;
+  --fx3: #e8fff2;
+}
+.fx-tone-gameover {
+  --fx1: #f97316;
+  --fx2: #fed7aa;
+  --fx3: #fff3e7;
+}
+
+/* Animated gradient: extremely slow, muted */
+.fx-gradient {
+  background: radial-gradient(1200px 800px at 10% 10%, var(--fx3), transparent 60%),
+    radial-gradient(1000px 700px at 90% 20%, color-mix(in oklab, var(--fx2) 50%, white 50%), transparent 60%),
+    radial-gradient(900px 700px at 40% 90%, color-mix(in oklab, var(--fx1) 45%, white 55%), transparent 55%);
+  opacity: 0.65;
+  animation: fx-pan 28s ease-in-out infinite alternate;
+}
+@keyframes fx-pan {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: saturate(0.95) blur(0px);
+  }
+  100% {
+    transform: translate3d(0, -6px, 0) scale(1.01);
+    filter: saturate(0.9) blur(0.2px);
+  }
+}
+
+/* Fine grain noise overlay */
+.fx-noise {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='120' height='120' filter='url(%23n)' opacity='0.06'/></svg>");
+  background-repeat: repeat;
+  background-size: 120px 120px;
+  opacity: 0.25;
+  mix-blend-mode: soft-light;
+}
+
+/* Soft spotlight that very slowly shifts */
+.fx-spotlight {
+  background: radial-gradient(600px 400px at 65% 35%, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0.0) 60%),
+    radial-gradient(700px 500px at 20% 75%, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.0) 65%);
+  animation: fx-spot 36s ease-in-out infinite alternate;
+}
+@keyframes fx-spot {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(0, 4px, 0);
+  }
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .fx-gradient,
+  .fx-spotlight {
+    animation: none !important;
+  }
+  .fx-gradient {
+    opacity: 0.5;
+  }
+}

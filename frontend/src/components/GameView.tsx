@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { CanvasGrid } from "./CanvasGrid";
 import type { Player, StrokePoint } from "../types/socket";
 import { Badge, Button, Card, Input, LabelField, Message, SectionTitle, Surface } from "./ui";
+import { Scene, SceneEffects } from "./Effects";
 
 type Props = {
   phase: string;
@@ -49,7 +50,10 @@ export function GameView(props: Props) {
   const canGuess = props.phase === "VIEW_GUESS";
 
   return (
-    <Surface className={`panel ${canDraw || canGuess ? "low-motion-zone" : ""}`}>
+    <Scene>
+      <SceneEffects active={props.phase === "REVEAL"} variant="reveal" />
+      <SceneEffects active={props.phase === "GAME_OVER"} variant="gameover" />
+      <Surface className={`panel ${canDraw || canGuess ? "low-motion-zone" : ""}`}>
       <SectionTitle
         title="Game"
         subtitle={`Round ${props.currentRound}/${props.maxRounds} ${
@@ -185,6 +189,7 @@ export function GameView(props: Props) {
         </Card>
       )}
       <Message text={props.message} />
-    </Surface>
+      </Surface>
+    </Scene>
   );
 }

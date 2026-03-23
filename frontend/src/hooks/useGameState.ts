@@ -36,6 +36,7 @@ export function useGameState() {
   const timerBase = useRef(0);
   const timerAt = useRef(0);
   const meRef = useRef<(Player & { roomId?: string; roomName?: string }) | null>(null);
+  const audioCtxRef = useRef<AudioContext | null>(null);
 
   useEffect(() => {
     meRef.current = me;
@@ -285,6 +286,9 @@ export function useGameState() {
   async function submitGuess(text: string) {
     const res = (await emitWithAck("guess:submit", { text })) as { ok?: boolean; correct?: boolean };
     if (res?.ok) {
+      if (res.correct) {
+        playCorrectGuessSound();
+      }
       setChat((prev) => [
         ...prev,
         { name: me?.name ?? "You", text: res.correct ? "" : text, isCorrect: !!res.correct },
@@ -317,6 +321,33 @@ export function useGameState() {
 
   function roomLabel() {
     return me?.roomName ? `${me.roomName} (${me.roomId})` : me?.roomId ?? "";
+  }
+
+  function playCorrectGuessSound() {
+    // Local-only success cue for the guesser; short and non-intrusive.
+    const AudioCtx = window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!AudioCtx) return;
+    try {
+      if (!audioCtxRef.current) {
+        audioCtxRef.current = new AudioCtx();
+      }
+      const ctx = audioCtxRef.current;
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(740, now);
+      osc.frequency.exponentialRampToValueAtTime(920, now + 0.12);
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(0.055, now + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.16);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.17);
+    } catch {
+      // Ignore autoplay/audio-context errors to avoid affecting gameplay.
+    }
   }
 
   return {
